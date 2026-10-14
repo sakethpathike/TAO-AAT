@@ -1,9 +1,11 @@
 package com.sakethh.tao_aat.domain
 
+import androidx.compose.runtime.Immutable
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 
 @Entity("ad_attribution")
+@Immutable
 data class Attribution(
     // I'd use UUIDv7 here,
     // for this assigmnet/example we should be fine with this
