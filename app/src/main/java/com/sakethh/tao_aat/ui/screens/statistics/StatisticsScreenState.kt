@@ -1,4 +1,4 @@
-package com.sakethh.tao_aat.ui.screens
+package com.sakethh.tao_aat.ui.screens.statistics
 
 import androidx.compose.runtime.Immutable
 import com.sakethh.tao_aat.domain.Attribution
@@ -11,6 +11,6 @@ data class StatisticsScreenState(
 )
 
 data class TypeStat(
-    val type:Attribution.Type,
+    val type: Attribution.Type,
     val count: Int
 )

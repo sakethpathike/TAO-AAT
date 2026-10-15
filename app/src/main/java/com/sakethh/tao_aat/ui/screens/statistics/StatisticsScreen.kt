@@ -1,4 +1,4 @@
-package com.sakethh.tao_aat.ui.screens
+package com.sakethh.tao_aat.ui.screens.statistics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

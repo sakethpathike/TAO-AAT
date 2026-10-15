@@ -1,10 +1,11 @@
-package com.sakethh.tao_aat.ui.screens
+package com.sakethh.tao_aat.ui.screens.events
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,7 +38,7 @@ fun EventQueueScreen(eventQueueScreenState: EventQueueScreenState) {
     TrackerScaffold { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+               .padding(top = paddingValues.calculateTopPadding())
                 .fillMaxSize(),
         ) {
             Text(text = "Event Queue", modifier = Modifier.padding(start = 15.dp, bottom = 7.5.dp))
@@ -65,6 +66,9 @@ fun EventQueueScreen(eventQueueScreenState: EventQueueScreenState) {
                                         .fillMaxWidth(), attribution = attribution
                                 )
                             }
+                            item {
+                                Spacer(Modifier.height(15.dp))
+                            }
                         }
                     }
 
@@ -79,6 +83,9 @@ fun EventQueueScreen(eventQueueScreenState: EventQueueScreenState) {
                                         .padding(start = 15.dp, end = 15.dp)
                                         .fillMaxWidth(), attribution = attribution
                                 )
+                            }
+                            item {
+                                Spacer(Modifier.height(15.dp))
                             }
                         }
                     }

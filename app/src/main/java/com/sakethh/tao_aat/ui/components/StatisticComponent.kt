@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sakethh.tao_aat.domain.Attribution
 import com.sakethh.tao_aat.ui.asColor
-import com.sakethh.tao_aat.ui.screens.TypeStat
+import com.sakethh.tao_aat.ui.screens.statistics.TypeStat
 import com.sakethh.tao_aat.ui.theme.TAOAATTheme
 
 @Composable

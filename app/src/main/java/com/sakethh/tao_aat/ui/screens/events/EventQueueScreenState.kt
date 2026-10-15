@@ -1,4 +1,4 @@
-package com.sakethh.tao_aat.ui.screens
+package com.sakethh.tao_aat.ui.screens.events
 
 import androidx.compose.runtime.Immutable
 import com.sakethh.tao_aat.domain.Attribution
