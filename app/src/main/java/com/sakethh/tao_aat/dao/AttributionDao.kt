@@ -5,6 +5,7 @@ import androidx.room3.Insert
 import androidx.room3.Query
 import androidx.room3.Update
 import com.sakethh.tao_aat.domain.Attribution
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AttributionDao {
@@ -25,4 +26,10 @@ interface AttributionDao {
 
     @Query("SELECT * FROM ad_attribution WHERE status = 'PROCESSING'")
     suspend fun getPendingAttributionOps(): List<Attribution>
+
+    @Query("SELECT * FROM ad_attribution")
+    fun getAllAttributions(): Flow<List<Attribution>>
+
+    @Query("DELETE FROM ad_attribution")
+    suspend fun dropAllRows()
 }

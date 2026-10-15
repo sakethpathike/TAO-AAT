@@ -9,11 +9,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlin.random.Random
@@ -27,11 +29,13 @@ class AttributionRepoImpl(
 ) : AttributionRepo {
     private val repoScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
-    fun shutdownDaemons() {
-        repoScope.cancel()
+    override fun shutdownDaemons() {
+        repoScope.coroutineContext.cancelChildren()
     }
 
-    init {
+    override fun relaunchDaemons() {
+        shutdownDaemons()
+
         repoScope.launch {
             processPendingAttributionOps()
         }
@@ -41,8 +45,13 @@ class AttributionRepoImpl(
         }
     }
 
+    init {
+        relaunchDaemons()
+    }
+
     /** status = 'PROCESSING'*/
     private suspend fun processPendingAttributionOps() {
+        println("processPendingAttributionOps")
         attributionDao.getPendingAttributionOps().forEach { attribution ->
             repoScope.launch {
                 processAttribute(attribution).collect()
@@ -52,6 +61,8 @@ class AttributionRepoImpl(
 
     private suspend fun retryFailedOpsDaemon() = supervisorScope {
         while (true) {
+            if (!isActive) break
+
             val failedOps =
                 attributionDao.getFailedAttributionOps(currentTime = System.currentTimeMillis())
 
@@ -59,7 +70,7 @@ class AttributionRepoImpl(
                 delay(1.seconds)
                 continue
             }
-
+            println("retryFailedOpsDaemon")
             failedOps.forEach { attribution ->
                 // flip to PROCESSING since we don't want this to be in the next iteration
                 attributionDao.updateAttribution(
@@ -72,18 +83,29 @@ class AttributionRepoImpl(
         }
     }
 
-    override suspend fun addAttribution(attribution: Attribution): Flow<Attribution.Status> = flow {
+    override fun addAttribution(type: Attribution.Type): Flow<Attribution.Status> = flow {
         // this will retrieve the installation status every time there is an INSTALL type, instead
         // we can use a lazy initialization from the upstream and use it across the usage,
         // for this example case, this should be fine
-        if (attribution.type == Attribution.Type.INSTALL && attributionDao.isInstalled()) return@flow
+        if (type == Attribution.Type.INSTALL && attributionDao.isInstalled()) return@flow
 
-        if (attribution.type == Attribution.Type.VISIT && attributionDao.didVisited(currentSessionId)) return@flow
+        if (type == Attribution.Type.VISIT && attributionDao.didVisited(currentSessionId)) return@flow
 
-        val rowId =
-            attributionDao.addAttribution(attribution.copy(status = Attribution.Status.PROCESSING))
+        val attribution = Attribution(
+            type = type,
+            status = Attribution.Status.PROCESSING,
+            insertedAt = System.currentTimeMillis(),
+            sessionId = currentSessionId,
+            nextRetryAt = null
+        )
+
+        val rowId = attributionDao.addAttribution(attribution)
 
         emitAll(processAttribute(attribution.copy(id = rowId)))
+    }
+
+    override fun getAllAttributions(): Flow<List<Attribution>> {
+        return attributionDao.getAllAttributions()
     }
 
     private fun getRandomDelayMs() = (1000L..5000L).random().milliseconds
@@ -113,5 +135,9 @@ class AttributionRepoImpl(
             )
             emit(Attribution.Status.RETRY)
         }
+    }
+
+    override suspend fun dropAllRows() {
+        attributionDao.dropAllRows()
     }
 }

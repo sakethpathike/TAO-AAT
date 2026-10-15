@@ -4,5 +4,13 @@ import com.sakethh.tao_aat.domain.Attribution
 import kotlinx.coroutines.flow.Flow
 
 interface AttributionRepo {
-    suspend fun addAttribution(attribution: Attribution): Flow<Attribution.Status>
+    fun addAttribution(type: Attribution.Type): Flow<Attribution.Status>
+
+    suspend fun dropAllRows()
+
+    fun getAllAttributions(): Flow<List<Attribution>>
+
+    fun shutdownDaemons()
+
+    fun relaunchDaemons()
 }
