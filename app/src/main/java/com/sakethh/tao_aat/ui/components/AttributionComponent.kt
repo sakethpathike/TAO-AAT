@@ -1,6 +1,7 @@
 package com.sakethh.tao_aat.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,7 +69,13 @@ fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
     }
 
     Card(
-        shape = RoundedCornerShape(15.dp), modifier = modifier
+        shape = RoundedCornerShape(15.dp),
+        modifier = modifier.border(
+            width = 1.dp,
+            color = Color.DarkGray,
+            shape = CardDefaults.shape
+        ),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(
             modifier = Modifier.padding(15.dp),
@@ -81,7 +90,7 @@ fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(attribution.type.asColor(), shape = CircleShape)
+                        .background(attribution.type.asColor(alpha = 0.15f), shape = CircleShape)
                 )
                 Spacer(modifier = Modifier.width(15.dp))
                 Column {
@@ -92,7 +101,7 @@ fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
             }
             Text(
                 text = if (attribution.status != Attribution.Status.RETRY) attribution.status.name else if (retryTime <= 0) "Retrying..." else "Retrying in ${retryTime}s",
-                color = attribution.status.asColor(alpha = 0.8f),
+                color = attribution.status.asColor(),
                 fontWeight = FontWeight.Bold
             )
         }

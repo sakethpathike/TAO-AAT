@@ -18,15 +18,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sakethh.tao_aat.domain.Attribution
+import com.sakethh.tao_aat.ui.ActiveTabColor
+import com.sakethh.tao_aat.ui.InActiveTabColor
 import com.sakethh.tao_aat.ui.components.AttributionComponent
 import com.sakethh.tao_aat.ui.components.Icons
 import com.sakethh.tao_aat.ui.components.TrackerScaffold
@@ -70,8 +74,15 @@ fun EventQueueScreen(
                 }
             }
             SecondaryTabRow(
-                modifier = Modifier.fillMaxWidth(), selectedTabIndex = pagerState.currentPage
-            ) {
+                modifier = Modifier.fillMaxWidth(),
+                selectedTabIndex = pagerState.currentPage,
+                indicator = {
+                    TabRowDefaults.SecondaryIndicator(
+                        color = ActiveTabColor, modifier = Modifier.tabIndicatorOffset(
+                            pagerState.currentPage, matchContentSize = false
+                        )
+                    )
+                }) {
                 TrackerTab(
                     index = 0, label = "IN PROGRESS", pagerState = pagerState
                 )
@@ -127,15 +138,21 @@ fun EventQueueScreen(
 @Composable
 private fun TrackerTab(index: Int, label: String, pagerState: PagerState) {
     val coroutineScope = rememberCoroutineScope()
+    val isSelected = pagerState.currentPage == index
     Tab(
-        selected = pagerState.currentPage == index,
+        selected = isSelected,
         onClick = {
             coroutineScope.launch {
                 pagerState.animateScrollToPage(index)
             }.start()
         },
     ) {
-        Text(text = label, modifier = Modifier.padding(12.dp))
+        Text(
+            text = label,
+            modifier = Modifier.padding(12.dp),
+            fontWeight = FontWeight.SemiBold,
+            color = if (isSelected) ActiveTabColor else InActiveTabColor
+        )
     }
 }
 
