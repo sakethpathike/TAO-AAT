@@ -16,7 +16,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,12 +32,39 @@ import com.sakethh.tao_aat.domain.Attribution
 import com.sakethh.tao_aat.ui.asColor
 import com.sakethh.tao_aat.ui.epochToReadableDateTime
 import com.sakethh.tao_aat.ui.theme.TAOAATTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
+import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
     val readableEpoch = retain(attribution.insertedAt) {
         epochToReadableDateTime(attribution.insertedAt)
     }
+
+    var retryTime by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+
+    LaunchedEffect(attribution.status) {
+        if (attribution.status == Attribution.Status.RETRY) {
+            withContext(Dispatchers.Default) {
+                while (true) {
+                    if (!isActive) break
+
+                    retryTime =
+                        ((attribution.nextRetryAt?.minus(System.currentTimeMillis()))?.div(1000)
+                            ?: 0).toInt()
+
+                    delay(500L.milliseconds)
+                }
+            }
+        }
+    }
+
     Card(
         shape = RoundedCornerShape(15.dp), modifier = modifier
     ) {
@@ -59,7 +91,7 @@ fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
                 }
             }
             Text(
-                text = attribution.status.name,
+                text = if (attribution.status != Attribution.Status.RETRY) attribution.status.name else if (retryTime <= 0) "Retrying..." else "Retrying in ${retryTime}s",
                 color = attribution.status.asColor(alpha = 0.8f),
                 fontWeight = FontWeight.Bold
             )
@@ -76,8 +108,9 @@ private fun AttributionComponentPreview() {
                 type = Attribution.Type.ADD_TO_CART,
                 status = Attribution.Status.PROCESSING,
                 insertedAt = 25252525252,
-                sessionId = "sfsdfsdfdsf"
-            )
+                sessionId = retain {
+                    UUID.randomUUID().toString()
+                })
         )
     }
 }
