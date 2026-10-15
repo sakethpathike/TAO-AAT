@@ -13,4 +13,8 @@ interface AttributionRepo {
     fun shutdownDaemons()
 
     fun relaunchDaemons()
+
+    fun getTotalProcessedAttributionsCount(): Flow<Int>
+    fun getTotalUniqueVisitCount(): Flow<Int>
+    fun getTotalCountByType(type: Attribution.Type): Flow<Int>
 }

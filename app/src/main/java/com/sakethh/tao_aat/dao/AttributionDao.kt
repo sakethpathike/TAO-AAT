@@ -32,4 +32,13 @@ interface AttributionDao {
 
     @Query("DELETE FROM ad_attribution")
     suspend fun dropAllRows()
+
+    @Query("SELECT COUNT(*) FROM ad_attribution WHERE status = 'PROCESSED'")
+    fun getProcessedAttributionsCount(): Flow<Int>
+
+    @Query("SELECT COUNT(DISTINCT sessionId) FROM ad_attribution")
+    fun getUniqueVisitCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM ad_attribution WHERE type = :type AND status = 'PROCESSED'")
+    fun getCountByProcessedType(type: Attribution.Type): Flow<Int>
 }

@@ -24,7 +24,7 @@ import com.sakethh.tao_aat.ui.navigation.Navigation
 import com.sakethh.tao_aat.ui.screens.events.EventQueueScreen
 import com.sakethh.tao_aat.ui.screens.events.EventQueueScreenVM
 import com.sakethh.tao_aat.ui.screens.statistics.StatisticsScreen
-import com.sakethh.tao_aat.ui.screens.statistics.StatisticsScreenState
+import com.sakethh.tao_aat.ui.screens.statistics.StatisticsScreenVM
 import com.sakethh.tao_aat.ui.theme.TAOAATTheme
 
 class MainActivity : ComponentActivity() {
@@ -56,18 +56,15 @@ class MainActivity : ComponentActivity() {
                                 EventQueueScreen(
                                     onReloadAttributes = {
                                         eventQueueScreenVM.dropAndAddAttributeRows()
-                                    },
-                                    eventQueueScreenState = eventQueueScreenState
+                                    }, eventQueueScreenState = eventQueueScreenState
                                 )
                             }
 
                             entry<Navigation.Statistics> {
+                                val statisticsScreenVM = aatViewModel<StatisticsScreenVM>()
+                                val statisticsScreenState by statisticsScreenVM.statisticsScreenState.collectAsStateWithLifecycle()
                                 StatisticsScreen(
-                                    statisticsScreenState = StatisticsScreenState(
-                                        stats = emptyList(),
-                                        totalEventsProcessed = 0,
-                                        totalUniqueVisits = 0
-                                    )
+                                    statisticsScreenState = statisticsScreenState
                                 )
                             }
                         })

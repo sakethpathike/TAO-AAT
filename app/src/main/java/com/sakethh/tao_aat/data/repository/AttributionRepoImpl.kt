@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -139,5 +138,17 @@ class AttributionRepoImpl(
 
     override suspend fun dropAllRows() {
         attributionDao.dropAllRows()
+    }
+
+    override fun getTotalProcessedAttributionsCount(): Flow<Int> {
+        return attributionDao.getProcessedAttributionsCount()
+    }
+
+    override fun getTotalUniqueVisitCount(): Flow<Int> {
+        return attributionDao.getUniqueVisitCount()
+    }
+
+    override fun getTotalCountByType(type: Attribution.Type): Flow<Int> {
+        return attributionDao.getCountByProcessedType(type)
     }
 }

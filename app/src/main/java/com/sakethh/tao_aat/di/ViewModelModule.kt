@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sakethh.tao_aat.ui.screens.events.EventQueueScreenVM
+import com.sakethh.tao_aat.ui.screens.statistics.StatisticsScreenVM
 import kotlin.reflect.KClass
 
 
@@ -22,6 +23,11 @@ object AATViewModelFactory : ViewModelProvider.Factory {
         EventQueueScreenVM::class -> EventQueueScreenVM(
             attributionRepo = DIContainer.attributionRepo
         )
+
+        StatisticsScreenVM::class -> StatisticsScreenVM(
+            attributionRepo = DIContainer.attributionRepo
+        )
+
         else -> error(
             "Not sure how to create an instance of ${modelClass.simpleName}",
         )
