@@ -7,5 +7,8 @@ import com.sakethh.tao_aat.domain.Attribution
 
 @Database(entities = [Attribution::class], version = 1, exportSchema = false)
 abstract class LocalDatabase : RoomDatabase() {
+    companion object{
+        const val NAME = "TAO-AAT_db"
+    }
     abstract val attributionDao: AttributionDao
 }
