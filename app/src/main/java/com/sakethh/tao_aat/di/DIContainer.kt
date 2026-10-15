@@ -3,6 +3,7 @@ package com.sakethh.tao_aat.di
 import com.sakethh.tao_aat.AATApp
 import com.sakethh.tao_aat.data.LocalDatabase
 import com.sakethh.tao_aat.data.repository.AttributionRepoImpl
+import com.sakethh.tao_aat.domain.TimeProvider
 import kotlinx.coroutines.Dispatchers
 
 class DIContainer(val database: LocalDatabase) {
@@ -11,7 +12,12 @@ class DIContainer(val database: LocalDatabase) {
             AttributionRepoImpl(
                 currentSessionId = AATApp.CURR_SESSION_ID,
                 attributionDao = getCurrentInstance().database.attributionDao,
-                coroutineDispatcher = Dispatchers.IO
+                coroutineDispatcher = Dispatchers.IO,
+                timeProvider = object : TimeProvider {
+                    override fun currentTimeMillis(): Long {
+                        return System.currentTimeMillis()
+                    }
+                }
             )
         }
 

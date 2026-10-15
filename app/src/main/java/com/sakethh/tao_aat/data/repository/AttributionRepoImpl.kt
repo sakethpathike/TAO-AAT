@@ -2,6 +2,7 @@ package com.sakethh.tao_aat.data.repository
 
 import com.sakethh.tao_aat.dao.AttributionDao
 import com.sakethh.tao_aat.domain.Attribution
+import com.sakethh.tao_aat.domain.TimeProvider
 import com.sakethh.tao_aat.domain.repository.AttributionRepo
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,6 +27,7 @@ class AttributionRepoImpl(
     private val attributionDao: AttributionDao,
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val shouldFailReporting: () -> Boolean = { Random.nextDouble() < 0.2 },
+    private val timeProvider: TimeProvider
 ) : AttributionRepo {
     private val repoScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
@@ -64,7 +66,7 @@ class AttributionRepoImpl(
             if (!isActive) break
 
             val failedOps =
-                attributionDao.getFailedAttributionOps(currentTime = System.currentTimeMillis())
+                attributionDao.getFailedAttributionOps(currentTime = timeProvider.currentTimeMillis())
 
             if (failedOps.isEmpty()) {
                 delay(1.seconds)
@@ -94,7 +96,7 @@ class AttributionRepoImpl(
         val attribution = Attribution(
             type = type,
             status = Attribution.Status.PROCESSING,
-            insertedAt = System.currentTimeMillis(),
+            insertedAt = timeProvider.currentTimeMillis(),
             sessionId = currentSessionId,
             nextRetryAt = null
         )
@@ -125,7 +127,7 @@ class AttributionRepoImpl(
         } catch (ce: CancellationException) {
             throw ce
         } catch (_: Exception) {
-            val retryTime = System.currentTimeMillis() + getRandomDelayMs().inWholeMilliseconds
+            val retryTime = timeProvider.currentTimeMillis() + getRandomDelayMs().inWholeMilliseconds
             // we do emit RETRY (to the UI or whoever's the caller is)
             // since the RETRY status is collected by #retryFailedOpsDaemon which retires the op
             attributionDao.updateAttribution(
