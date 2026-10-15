@@ -1,8 +1,10 @@
 package com.sakethh.tao_aat.ui
 
 import androidx.compose.ui.graphics.Color
-import androidx.core.flagging.Flags
 import com.sakethh.tao_aat.domain.Attribution
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 fun Attribution.Type.asColor(alpha: Float = 0.75f): Color {
     return when (this) {
@@ -19,4 +21,15 @@ fun Attribution.Status.asColor(alpha: Float = 0.75f): Color {
         Attribution.Status.PROCESSING -> Color.Blue.copy(alpha)
         Attribution.Status.RETRY -> Color.Yellow.copy(alpha)
     }
+}
+
+fun epochToReadableDateTime(
+    epochSeconds: Long,
+): String = try {
+    val date = Date(epochSeconds)
+    val formatter = SimpleDateFormat("hh:mm:ss a", Locale.getDefault())
+    formatter.format(date)
+} catch (e: Exception) {
+    e.printStackTrace()
+    epochSeconds.toString()
 }

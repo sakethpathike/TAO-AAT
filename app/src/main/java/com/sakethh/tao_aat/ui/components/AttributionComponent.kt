@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,10 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sakethh.tao_aat.domain.Attribution
 import com.sakethh.tao_aat.ui.asColor
+import com.sakethh.tao_aat.ui.epochToReadableDateTime
 import com.sakethh.tao_aat.ui.theme.TAOAATTheme
 
 @Composable
 fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
+    val readableEpoch = retain(attribution.insertedAt) {
+        epochToReadableDateTime(attribution.insertedAt)
+    }
     Card(
         shape = RoundedCornerShape(15.dp), modifier = modifier
     ) {
@@ -50,7 +55,7 @@ fun AttributionComponent(modifier: Modifier, attribution: Attribution) {
                 Column {
                     Text(text = attribution.type.name, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(5.dp))
-                    Text(text = attribution.insertedAt.toString())
+                    Text(text = readableEpoch)
                 }
             }
             Text(

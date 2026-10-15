@@ -46,7 +46,7 @@ fun EventQueueScreen(
     TrackerScaffold { paddingValues ->
         Column(
             modifier = Modifier
-               .padding(top = paddingValues.calculateTopPadding())
+                .padding(top = paddingValues.calculateTopPadding())
                 .fillMaxSize(),
         ) {
             Row(
@@ -86,7 +86,9 @@ fun EventQueueScreen(
                             item {
                                 Spacer(Modifier)
                             }
-                            items(eventQueueScreenState.allEvents) { attribution ->
+                            items(
+                                eventQueueScreenState.allEvents,
+                                key = { it.toString() }) { attribution ->
                                 AttributionComponent(
                                     modifier = Modifier
                                         .padding(start = 15.dp, end = 15.dp)
