@@ -24,7 +24,8 @@ import kotlin.time.Duration.Companion.seconds
 class AttributionRepoImpl(
     private val currentSessionId: String,
     private val attributionDao: AttributionDao,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val shouldFailReporting: () -> Boolean = { Random.nextDouble() < 0.2 },
 ) : AttributionRepo {
     private val repoScope = CoroutineScope(SupervisorJob() + coroutineDispatcher)
 
@@ -113,7 +114,7 @@ class AttributionRepoImpl(
         emit(Attribution.Status.PROCESSING)
         try {
             delay(getRandomDelayMs())
-            if (Random.nextDouble() < 0.2) throw Exception()
+            if (shouldFailReporting()) throw Exception()
 
             attributionDao.updateAttribution(
                 attribution.copy(
